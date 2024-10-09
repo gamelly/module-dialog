@@ -1,6 +1,7 @@
-local function draw(std, game)
+local function event_draw(std, game)
     if std.dialog.id == nil then return end
     local dialog = std.dialog.list[std.dialog.id]
+    print('dialog draw')
 
     if dialog.style == std.dialog.style_msgbox then
         std.draw.font(16)
@@ -57,17 +58,16 @@ local function draw(std, game)
     end
 end
 
-local function install(std, game)
-    local event_draw = function()
-        draw(std, game)
-    end
+local function event_bus(std, game)
+    std.bus.listen_std('draw', event_draw)
+end
 
-    return {
-        event={draw=event_draw}
-    }
+local function install(std, game)
+
 end
 
 local P = {
+    event_bus = event_bus,
     install=install
 }
 
