@@ -170,29 +170,29 @@ end
 
 --! @cond
 
-local function key(std, game, application)
+local function event_key(std, game, application)
     if not std.dialog.id then return end
     local dialog_style = std.dialog.list[std.dialog.id].style
     local handler_func = application.callbacks.dialog or function() end
-
-    local key_button = std.key.press.enter
-    local key_y = std.key.press.down - std.key.press.up
-    local key_x = std.key.press.left - std.key.press.right
     
     if dialog_style == std.dialog.style_msgbox then        
         
     elseif dialog_style == std.dialog.style_list then        
-        std.dialog.item = std.math.clamp(std.dialog.item + key_y, 1, 4)
+        std.dialog.item = std.math.clamp(std.dialog.item + std.key.axis.y, 1, 4)
     end
 
-    if key_button ~= 0 then
-        std.dialog.response = key_button == 1
+    if std.key.press.a then
+        std.dialog.response = true
         handler_func(std, game)
         std.dialog.response = nil
         if std.dialog.ttl ~= game.milis then
             std.dialog.id = nil
         end
     end
+end
+
+local function event_bus(std, game)
+    std.bus.listen_std('key', event_key)
 end
 
 local function install(std, game, application)
@@ -216,17 +216,10 @@ local function install(std, game, application)
         show = function(dialog_id) return show(std, game, dialog_id) end,
         index = function(dialog_id) return index(std, game, dialog_id) end
     }
-
-    local event_keydown = function()
-        key(std, game, application)
-    end
-
-    return {
-        event={keydown=event_keydown}
-    }
 end
 
 local P = {
+    event_bus = event_bus,
     install=install
 }
 
